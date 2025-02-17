@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<script src="{{ url_for('static', filename='js/admin.js') }}" defer></script>
+
+
+
+    <main class="admin-content">
+        <h1>Welcome, Admin</h1>
+        <p>Use the sidebar to navigate through the admin panel.</p>
+    </main>
+</div>
+{% endblock %}

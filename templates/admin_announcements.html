@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📢 Manage Announcements</h2>
+
+<!-- 🚀 Announcement Form -->
+<form id="announcementForm">
+    <input type="text" id="announcementTitle" placeholder="Title" required>
+    <textarea id="announcementMessage" placeholder="Message" required></textarea>
+    <button type="submit">Post Announcement</button>
+</form>
+
+<!-- 🚀 Announcements Table -->
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Message</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="announcementTable">
+        {% for announcement in announcements %}
+        <tr data-id="{{ announcement.id }}">
+            <td>{{ announcement.title }}</td>
+            <td>{{ announcement.message }}</td>
+            <td>{{ announcement.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+                <button class="delete-btn" onclick="deleteAnnouncement({{ announcement.id }})">🗑️ Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("announcementForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const title = document.getElementById("announcementTitle").value.trim();
+        const message = document.getElementById("announcementMessage").value.trim();
+
+        if (!title || !message) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        fetch("/admin/announcements", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title, message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("Announcement posted!");
+                window.location.reload();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+// ✅ Delete Announcement Function
+function deleteAnnouncement(id) {
+    if (!confirm("Are you sure you want to delete this announcement?")) return;
+
+    fetch(`/admin/delete-announcement/${id}`, { method: "POST" })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("Announcement deleted!");
+                document.querySelector(`tr[data-id="${id}"]`).remove();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+}
+</script>
+
+{% endblock %}

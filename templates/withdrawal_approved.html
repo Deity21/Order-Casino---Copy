@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: #fff; }
+        .container { padding: 20px; border-radius: 10px; background-color: #1e1e1e; }
+        .logo img { width: 120px; }
+        h2 { color: #00ff00; }
+        p { font-size: 16px; }
+        .footer { margin-top: 20px; font-size: 14px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"><img src="{{ url_for('static', filename='images/lo9go.png') }}" alt="Glamorilla Logo"></div>
+        <h2>✅ Withdrawal Approved!</h2>
+        <p>Hello {{ username }},</p>
+        <p>Your withdrawal request of <strong>${{ amount }}</strong> has been **approved**.</p>
+        <p>Type: <strong>{{ withdraw_type }}</strong></p>
+        <p>Your funds should arrive shortly.</p>
+        <p>Processing time: 12-24 hours.</p>
+        <div class="footer">© 2025 Glamorilla Casino. All Rights Reserved.</div>
+    </div>
+</body>
+</html>

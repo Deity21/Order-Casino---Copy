@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Game Logs{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <h1>🎰 Game Logs</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Bet Amount</th>
+                <th>Winnings</th>
+                <th>Balance</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="gameLogsTable">
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.id }}</td>
+                <td>${{ "%.2f"|format(log.bet) }}</td>
+                <td style="color: {% if log.winnings > 0 %}green{% else %}red{% endif %};">
+                    ${{ "%.2f"|format(log.winnings) }}
+                </td>
+                <td>${{ "%.2f"|format(log.balance) }}</td>
+                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No game logs found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById("gameLogsTable");
+    
+        // Show a loading message while fetching logs
+        tableBody.innerHTML = "<tr><td colspan='5' style='text-align: center;'>Loading game logs...</td></tr>";
+    
+        fetch("/get-logs")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                tableBody.innerHTML = ""; // Clear loading message
+    
+                if (!data || data.length === 0) {
+                    tableBody.innerHTML = "<tr><td colspan='5' style='text-align: center;'>No game logs found.</td></tr>";
+                    return;
+                }
+    
+                data.forEach(log => {
+                    const row = document.createElement("tr");
+    
+                    // Format currency values properly
+                    const betAmount = log.bet ? `$${parseFloat(log.bet).toFixed(2)}` : "$0.00";
+                    const winningsAmount = log.winnings ? `$${parseFloat(log.winnings).toFixed(2)}` : "$0.00";
+                    const balanceAmount = log.balance ? `$${parseFloat(log.balance).toFixed(2)}` : "$0.00";
+                    
+                    // Convert timestamp to readable format
+                    const formattedTimestamp = new Date(log.timestamp).toLocaleString();
+    
+                    row.innerHTML = `
+                        <td>${log.id || "N/A"}</td>
+                        <td>${betAmount}</td>
+                        <td style="color: ${log.winnings > 0 ? 'green' : 'red'};">${winningsAmount}</td>
+                        <td>${balanceAmount}</td>
+                        <td>${formattedTimestamp}</td>
+                    `;
+    
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error("❌ Error fetching game logs:", error);
+                tableBody.innerHTML = "<tr><td colspan='5' style='text-align: center; color: red;'>Failed to load game logs.</td></tr>";
+            });
+    });
+    
+    
+</script>
+{% endblock %}

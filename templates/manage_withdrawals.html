@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Manage Withdrawals</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Type</th> <!-- ✅ Display NFT or Cash -->
+            <th>Network</th>
+            <th>Wallet Address</th>
+            <th>Status</th>
+            <th>Timestamp</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for withdrawal in withdrawals %}
+        <tr>
+            <tr>
+                <td>{{ withdrawal.id }}</td>
+                <td>{{ withdrawal.username }}</td> <!-- ✅ Access username correctly -->
+                <td>${{ "%.2f"|format(withdrawal.amount) }}</td>
+                <td>{{ withdrawal.network }}</td>
+                <td>{{ withdrawal.wallet_address }}</td>
+                <td>{{ withdrawal.withdraw_type }}</td>  <!-- ✅ Show "NFT" or "Cash" -->
+                <td>{{ withdrawal.status }}</td>
+                <td>{{ withdrawal.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+           
+            
+            <td>
+                {% if withdrawal.status == 'Pending' %}
+                    <button onclick="approveWithdrawal({{ withdrawal.id }})" class="approve-btn">✅ Approve</button>
+                    <button onclick="rejectWithdrawal({{ withdrawal.id }})" class="reject-btn">❌ Reject</button>
+                {% else %}
+                    <span>Completed</span>
+                {% endif %}
+            </td>
+            <!-- ❌ Rejection Popup -->
+            <div id="rejectPopup" class="popup-overlay">
+                <div class="popup-box">
+                    <h3>Enter Rejection Reason</h3>
+                    <textarea id="rejectReason" placeholder="Enter reason..."></textarea>
+                    <div class="popup-buttons">
+                        <button onclick="submitRejection()">Reject</button>
+                        <button class="close-btn" onclick="closeRejectPopup()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function approveWithdrawal(id) {
+    fetch(`/admin/approve-withdrawal/${id}`, { method: "POST" })
+        .then(res => res.json())
+        .then(data => alert(data.message))
+        .catch(err => console.error(err));
+}
+
+async function rejectWithdrawal(withdrawalId) {
+    document.getElementById("rejectPopup").style.display = "flex";
+    document.getElementById("rejectPopup").dataset.withdrawalId = withdrawalId;
+}
+
+// ✅ Close the rejection popup
+function closeRejectPopup() {
+    document.getElementById("rejectPopup").style.display = "none";
+    document.getElementById("rejectReason").value = ""; // Clear reason field
+}
+
+// ✅ Submit rejection with reason
+async function submitRejection() {
+    let withdrawalId = document.getElementById("rejectPopup").dataset.withdrawalId;
+    let reason = document.getElementById("rejectReason").value.trim();
+
+    if (!reason) {
+        alert("Rejection reason is required.");
+        return;
+    }
+
+    try {
+        let response = await fetch(`/admin/reject-withdrawal/${withdrawalId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason })
+        });
+
+        let result = await response.json();
+        alert(result.message);  
+        closeRejectPopup();
+        location.reload();  
+
+    } catch (error) {
+        console.error("❌ Error rejecting withdrawal:", error);
+        alert("Failed to reject withdrawal.");
+    }
+}
+
+
+</script>
+{% endblock %}

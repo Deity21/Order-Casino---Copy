@@ -1,0 +1,211 @@
+/* General Styling */
+body {
+    margin: 0;
+    font-family: Inter;
+font-size: 20.7px;
+font-weight: 600;
+
+    background-color: #000;
+    color: #fff;
+    display: grid;
+    place-items: center;
+  }
+  main{
+    width: 1060px;
+  }
+  .main-container, .whitepaper-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 50px;
+  }
+  
+  h1, h2 {
+    margin: 0;
+  }
+  
+  button {
+    cursor: pointer;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+  }
+  
+  /* Left Section */
+  .left-section {
+    max-width: 40%;
+  }
+  
+  .title {
+    font-size: 3rem;
+  }
+  
+  .highlight {
+    color: #f8b400;
+  }
+  
+  .description {
+    font-size: 1rem;
+    margin: 20px 0;
+  }
+  
+  .button-container {
+    display: grid;
+    gap: 10px;
+  }
+  
+  .community-btn, .play-btn {
+    
+    background-color: #444;
+    color: #fff;
+  }
+  
+  .play-btn {
+    background-color: #f8b400;
+  }
+  
+  .cashback {
+    font-size: 2.5rem;
+    margin-top: 40px;
+    color: #f8b400;
+    text-align: center;
+  }
+  
+  .small-text {
+    font-size: 0.8rem;
+    color: #aaa;
+    text-align: center;
+  }
+  
+  /* Right Section */
+  .right-section {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .card {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    padding: 30px;
+    max-width: 400px;
+    text-align: center;
+  }
+  .svg{
+    width: 100%;
+  }
+  .goal-amount {
+    color: #f8b400;
+    font-size: 2.5rem;
+  }
+  
+  .price-info {
+    font-size: 0.9rem;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .progress-bar {
+    background-color: #444;
+    height: 10px;
+    border-radius: 5px;
+    margin: 20px 0;
+  }
+  
+  .progress {
+    width: 0;
+    height: 100%;
+    background-color: #f8b400;
+    border-radius: 5px;
+  }
+  
+  .token-sale {
+    margin: 10px 0;
+    font-size: 1.2rem;
+    color: #f8b400;
+  }
+  
+  .wallet-section {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+  }
+  
+  .wallet-address {
+    flex: 1;
+    padding: 8px;
+    background-color: #333;
+    border: none;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px 0 0 5px;
+  }
+  
+  .copy-btn {
+    background-color: #f8b400;
+    color: #000;
+    border-radius: 0 5px 5px 0;
+  }
+  
+  .action-buttons {
+    display: grid;
+   grid-template-columns: 70% 30%;
+    margin: 20px 0;
+    font-size: 9.6px;
+  }
+  .network-info{
+    font-size: 9px;
+    color: #444;
+  }
+ 
+  .pancakeswap-btn, .view-chart-btn {
+    flex: 1;
+    margin: 5px;
+    background-color: #444;
+    color: #fff;
+    font-size: 9.6px;
+  }
+  .view-chart-btn{
+    background-color: black;
+
+  }
+  .connect-wallet-btn {
+    background-color: #f8b400;
+    color: #000;
+    width: 100%;
+  }
+  
+  .staking-info {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+  
+  /* Whitepaper Section */
+  .whitepaper-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1em;
+   
+    /* background-color: #1e1e1e; */
+  }
+  
+  .whitepaper-title {
+    font-size: 2rem;
+    /* margin-bottom: 20px; */
+  }
+  
+  .whitepaper-description {
+    font-size: 1rem;
+    max-width: 600px;
+    
+  }
+  
+  .whitepaper-btn {
+    background-color: #f8b400;
+    color: #fff;
+    margin-top: 20px;
+   width: 50%;
+  }
+  

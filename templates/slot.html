@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Slot Machine</title>
+    <link rel="stylesheet" href="static/css/slot-style.css">
+</head>
+<body>
+    <div class="video-container">
+        <video autoplay loop muted>
+            <source src="static/videos/videt.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    
+    <div class="slot-machine-container">
+        <div class="slot-header">WIN!</div>
+        <div class="slot-machine">
+            <div class="reel" id="reel1"></div>
+            <div class="reel" id="reel2"></div>
+            <div class="reel" id="reel3"></div>
+        </div>
+        <div class="bet-container">
+            <input type="number" id="bet-amount" placeholder="Enter Bet Amount" min="1">
+        </div>
+        <button id="spin-button">SPIN</button>
+        <div id="balance">Balance: $100</div>
+        <div id="message"></div>
+        <div class="log-container" id="game-log"></div>
+    </div>
+    
+    <div class="bottom-image-container">
+        <img src="static/images/bt.png" alt="Bottom Right Image">
+    </div>
+    
+
+    <script src="static/js/slot-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: #fff; }
+        .container { padding: 20px; border-radius: 10px; background-color: #1e1e1e; }
+        .logo img { width: 120px; }
+        h2 { color: #ff9900; }
+        p { font-size: 16px; }
+        .footer { margin-top: 20px; font-size: 14px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"><img src="{{ url_for('static', filename='images/lo9go.png') }}" alt="Glamorilla Logo"></div>
+        <h2>📢 New Announcement from Glamorilla</h2>
+        <p><strong>{{ title }}</strong></p>
+        <p>{{ message }}</p>
+        <div class="footer">© 2025 Glamorilla Casino. All Rights Reserved.</div>
+    </div>
+</body>
+</html>

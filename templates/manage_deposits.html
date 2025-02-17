@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Manage Deposits</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Amount</th>
+            <th>Network</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for deposit in deposits %}
+        <tr>
+            <td>{{ deposit.id }}</td>
+            <td>{{ deposit.user_id }}</td>
+            <td>${{ deposit.amount }}</td>
+            <td>{{ deposit.network }}</td>
+            <td>{{ deposit.status }}</td>
+            <td>{{ deposit.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

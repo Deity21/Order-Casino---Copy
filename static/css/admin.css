@@ -1,0 +1,238 @@
+/* 🌍 General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background: #121212;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+/* 🔥 Admin Container */
+.admin-container {
+    display: flex;
+}
+
+/* 📌 Sidebar */
+.admin-sidebar {
+    width: 260px;
+    background: #1e1e1e;
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 2px 0px 5px rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar h2 {
+    color: #ff9900;
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.admin-sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.admin-sidebar ul li {
+    padding: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar ul li a {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Space between icon and text */
+    font-size: 16px;
+    padding: 12px;
+    transition: background 0.3s, padding-left 0.3s;
+}
+
+.admin-sidebar ul li a i {
+    font-size: 20px; /* Adjust icon size */
+    color: #ff9900; /* Match theme color */
+}
+
+.admin-sidebar ul li a:hover {
+    background: #ff9900;
+    color: #000;
+    padding-left: 15px;
+}
+
+/* 🎯 Admin Content */
+.admin-content {
+    margin-left: 280px;
+    padding: 30px;
+    width: calc(100% - 280px); /* Ensure content is centered */
+    text-align: center;
+}
+
+/* 🚀 Table Styling */
+table {
+    width: 95%;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+}
+
+th, td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th {
+    background: #ff9900;
+    color: #000;
+    font-weight: bold;
+}
+
+tr:hover {
+    background: rgba(255, 153, 0, 0.2);
+}
+
+/* ✅ Buttons */
+button {
+    background: #ff9900;
+    border: none;
+    padding: 10px 16px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 6px;
+}
+
+button:hover {
+    background: #ffcc66;
+}
+
+/* ❌ Delete Button */
+.delete-btn {
+    background: #ff4444;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #ff6666;
+}
+
+/* 📢 Announcements Form */
+#announcementForm {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 0 auto 20px;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+#announcementForm input,
+#announcementForm textarea {
+    width: 95%;
+    padding: 12px;
+    margin: 8px 0;
+    background: #333;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 6px;
+    text-align: center;
+}
+
+#announcementForm button {
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* 🚀 Logout Button */
+.logout {
+    color: red !important;
+    font-weight: bold;
+    padding: 12px;
+    display: block;
+    text-align: center;
+    background: rgba(255, 0, 0, 0.2);
+    transition: background 0.3s;
+}
+
+.logout:hover {
+    background: rgba(255, 0, 0, 0.4);
+}
+
+/* ❌ Rejection Popup */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.popup-box {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.popup-box h3 {
+    color: #ff4444;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.popup-box textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.popup-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-buttons button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.popup-buttons button:first-child {
+    background: #ff4444;
+    color: white;
+}
+
+.popup-buttons button:first-child:hover {
+    background: #ff6666;
+}
+
+.popup-buttons .close-btn {
+    background: #777;
+    color: white;
+}
+
+.popup-buttons .close-btn:hover {
+    background: #999;
+}

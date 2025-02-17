@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Manage Users</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Balance</th>
+            <th>Admin</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>${{ user.balance }}</td>
+            <td>{% if user.is_admin %} ✅ {% else %} ❌ {% endif %}</td>
+            <td>
+                <button onclick="banUser({{ user.id }})">Ban/Unban</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+function banUser(userId) {
+    fetch(`/admin/ban-user/${userId}`, { method: "POST" })
+        .then(res => res.json())
+        .then(data => alert(data.message))
+        .catch(err => console.error(err));
+}
+</script>
+{% endblock %}
