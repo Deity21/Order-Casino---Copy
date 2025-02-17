@@ -14,7 +14,7 @@ from flask_mail import Mail, Message
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user_tphc_user:4cDudUnZXbqvkGIImTrrcY1KduZKomeE@dpg-cuphmhd6l47c73cmiqt0-a/user_tphc'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key'
