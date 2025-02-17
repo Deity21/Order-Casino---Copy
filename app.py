@@ -84,6 +84,7 @@ class Deposit(db.Model):
     status = db.Column(db.String(20), nullable=False, default='Pending')
     payment_id = db.Column(db.String(100), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # ✅ Add timestamp
     
 class Announcement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -852,6 +853,45 @@ def send_email(to, subject, template, **kwargs):
     except Exception as e:
         print(f"❌ Email error: {str(e)}")
 
+@app.route('/get-transactions', methods=['GET'])
+def get_transactions():
+    """Fetch user's deposit and withdrawal transaction history."""
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 401
+
+    user = db.session.get(User, session['user_id'])  # ✅ Use correct SQLAlchemy 2.0 syntax
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # ✅ Fetch Deposits
+    deposits = Deposit.query.filter_by(user_id=user.id).order_by(Deposit.timestamp.desc()).all()
+
+    # ✅ Fetch Withdrawals
+    withdrawals = Withdrawal.query.filter_by(user_id=user.id).order_by(Withdrawal.timestamp.desc()).all()
+
+    # ✅ Format transactions list
+    transactions = []
+
+    for deposit in deposits:
+        transactions.append({
+            'timestamp': deposit.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            'type': 'Deposit',
+            'amount': deposit.amount,
+            'status': 'Completed'  # Assuming all deposits are successful
+        })
+
+    for withdrawal in withdrawals:
+        transactions.append({
+            'timestamp': withdrawal.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            'type': 'Withdrawal',
+            'amount': withdrawal.amount,
+            'status': withdrawal.status  # ✅ Displays Pending, Approved, or Rejected
+        })
+
+    # ✅ Sort transactions by timestamp (latest first)
+    transactions.sort(key=lambda x: x['timestamp'], reverse=True)
+
+    return jsonify({'transactions': transactions})
 
 with app.app_context():
     db.create_all()  # ✅ Ensure tables are created before running the app

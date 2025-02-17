@@ -409,16 +409,17 @@
             <!-- Transaction History Button -->
             <a href="#" class="history-link" onclick="openHistoryPopup()">History</a>
 
-            <!-- Transaction History Pop-up -->
-            <div id="history-popup" class="popup-container" style="display: none;">
-                <div class="popup-content">
+            <!-- 🏦 Transaction History Popup -->
+            <div id="history-popup" class="popup-overlay">
+                <div class="popup-box">
                     <span class="close-btn" onclick="closeHistoryPopup()">&times;</span>
                     <h2>Transaction History</h2>
                     <div id="transaction-list">
-                        <!-- Transactions will be loaded here dynamically -->
+                        <p>Loading transactions...</p>
                     </div>
                 </div>
             </div>
+
 
           </div>
         </div>

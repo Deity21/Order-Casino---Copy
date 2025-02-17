@@ -204,44 +204,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Transaction History Pop-up
 function openHistoryPopup() {
-  const historyPopup = document.getElementById('history-popup');
-  const transactionList = document.getElementById('transaction-list');
+    const historyPopup = document.getElementById("history-popup");
+    const transactionList = document.getElementById("transaction-list");
 
-  // Show the popup
-  historyPopup.style.display = 'flex';
+    // Show the popup
+    historyPopup.style.display = "flex";
 
-  // Fetch and populate transaction history
-  fetch('/profile')
-      .then(response => {
-          if (!response.ok) {
-              throw new Error(`Error fetching transactions: ${response.status}`);
-          }
-          return response.json();
-      })
-      .then(data => {
-          if (data.transactions) {
-              transactionList.innerHTML = ''; // Clear existing content
+    // Fetch and populate transaction history
+    fetch("/get-transactions")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error fetching transactions: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            transactionList.innerHTML = ""; // Clear existing content
 
-              // Populate transactions dynamically
-              data.transactions.forEach(transaction => {
-                  const transactionItem = document.createElement('p');
-                  transactionItem.textContent = `${transaction.timestamp} - ${transaction.type.toUpperCase()}: $${transaction.amount.toFixed(2)}`;
-                  transactionList.appendChild(transactionItem);
-              });
-          } else {
-              transactionList.innerHTML = '<p>No transactions found.</p>';
-          }
-      })
-      .catch(error => {
-          console.error('Error loading transactions:', error);
-          transactionList.innerHTML = '<p>Error loading transactions.</p>';
-      });
+            if (data.transactions.length === 0) {
+                transactionList.innerHTML = "<p>No transactions found.</p>";
+                return;
+            }
+
+            // Populate transactions dynamically
+            data.transactions.forEach(transaction => {
+                const transactionItem = document.createElement("p");
+
+                // Style status color (✅ Green for approved, ❌ Red for rejected, 🟡 Yellow for pending)
+                let statusColor = transaction.status === "Approved" ? "green" :
+                                  transaction.status === "Rejected" ? "red" : "yellow";
+
+                transactionItem.innerHTML = `
+                    <span style="font-weight: bold;">${transaction.timestamp}</span> - 
+                    ${transaction.type.toUpperCase()}: 
+                    <span style="color: ${statusColor};">$${transaction.amount.toFixed(2)}</span> 
+                    <strong>(${transaction.status})</strong>
+                `;
+                
+                transactionList.appendChild(transactionItem);
+            });
+        })
+        .catch(error => {
+            console.error("❌ Error loading transactions:", error);
+            transactionList.innerHTML = "<p>Error loading transactions.</p>";
+        });
 }
 
+// ✅ Close Popup
 function closeHistoryPopup() {
-  const historyPopup = document.getElementById('history-popup');
-  historyPopup.style.display = 'none';
+    document.getElementById("history-popup").style.display = "none";
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   fetch('/get-balance')
