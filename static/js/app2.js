@@ -689,7 +689,7 @@ async function submitDeposit() {
         return;
     }
 
-    if (!["TRC20", "ERC20", "BEP20"].includes(network)) {
+    if (!["TRC20", "ERC20", "SOL", "BEP20"].includes(network)) {
         alert("Invalid network. Choose TRC20, ERC20, or BEP20.");
         return;
     }

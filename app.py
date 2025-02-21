@@ -531,7 +531,9 @@ def create_deposit():
     network_mapping = {
         "TRC20": "usdttrc20",  # USDT on Tron
         "ERC20": "usdterc20",  # USDT on Ethereum
+        "SOL": "usdtsol",
         "BEP20": "usdtbsc"     # USDT on Binance Smart Chain
+        
     }
 
     if network not in network_mapping:
