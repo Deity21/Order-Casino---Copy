@@ -525,17 +525,28 @@ def create_deposit():
 
     data = request.get_json()
     amount = data.get('amount')
-    network = data.get('network').upper()  # Convert network to uppercase
+    network = data.get('network', "").strip().upper()
 
-    # ✅ Allowed USDT networks
+    # ✅ Corrected USDT Network Mapping Based on NowPayments API Response
     network_mapping = {
-        "TRC20": "usdttrc20",
-        "ERC20": "usdt",
-        "BEP20": "usdtbep20"
+        "TRC20": "usdttrc20",  # USDT on Tron
+        "ERC20": "usdterc20",  # USDT on Ethereum
+        "BEP20": "usdtbsc"     # USDT on Binance Smart Chain
     }
 
     if network not in network_mapping:
-        return jsonify({'error': f'Invalid network. Use TRC20, ERC20, or BEP20 for USDT.'}), 400
+        return jsonify({'error': 'Invalid network. Use TRC20, ERC20, or BEP20.'}), 400
+
+    pay_currency = network_mapping[network]
+
+    # ✅ Fetch latest supported currencies from NowPayments to confirm it's available
+    NOWPAYMENTS_API_KEY = app.config['NOWPAYMENTS_API_KEY']
+    headers = {"x-api-key": NOWPAYMENTS_API_KEY}
+    currency_response = requests.get("https://api.nowpayments.io/v1/currencies", headers=headers)
+    supported_currencies = currency_response.json().get("currencies", [])
+
+    if pay_currency not in supported_currencies:
+        return jsonify({'error': f'{pay_currency} is not supported by NowPayments'}), 400
 
     user = User.query.get(session['user_id'])
     if not user:
@@ -545,16 +556,10 @@ def create_deposit():
     order_id = f"user_{user.id}_{timestamp}"
     print(f"Generated Order ID: {order_id}")  # ✅ Debugging
 
-    headers = {
-        "x-api-key": app.config['NOWPAYMENTS_API_KEY'],
-        "Content-Type": "application/json"
-    }
-
-    # ✅ Fix: Use correct "pay_currency" format
     payload = {
         "price_amount": amount,
         "price_currency": "usd",
-        "pay_currency": network_mapping[network],  # ✅ Fix: Correct format for NowPayments
+        "pay_currency": pay_currency,  # ✅ Correct format for NowPayments
         "order_id": order_id,
         "ipn_callback_url": "https://yourdomain.com/nowpayments-webhook"
     }
@@ -567,18 +572,22 @@ def create_deposit():
     if response.status_code != 200 or not data.get('invoice_url'):
         return jsonify({'error': 'Failed to create deposit link', 'response': data}), 500
 
-    # ✅ Save deposit in DB
+    payment_id = data.get('id')
+    if not payment_id:
+        return jsonify({'error': 'No payment ID returned from NowPayments'}), 500
+
     deposit = Deposit(
         user_id=user.id,
         amount=amount,
         network=network,
         status="Pending",
-        payment_id=data.get('id')
+        payment_id=payment_id
     )
     db.session.add(deposit)
     db.session.commit()
 
     return jsonify({"success": True, "payment_url": data.get('invoice_url')})
+
 
 
 @app.route('/nowpayments-webhook', methods=['POST'])

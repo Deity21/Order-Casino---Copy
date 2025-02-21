@@ -682,10 +682,15 @@ document.head.appendChild(style);
 
 async function submitDeposit() {
     let amount = parseFloat(document.getElementById("depositAmount").value);
-    let network = document.getElementById("usdtNetwork").value;
+    let network = document.getElementById("usdtNetwork").value.trim().toUpperCase();
 
     if (isNaN(amount) || amount <= 0) {
         alert("Enter a valid deposit amount.");
+        return;
+    }
+
+    if (!["TRC20", "ERC20", "BEP20"].includes(network)) {
+        alert("Invalid network. Choose TRC20, ERC20, or BEP20.");
         return;
     }
 
@@ -699,14 +704,16 @@ async function submitDeposit() {
         let data = await response.json();
 
         if (response.ok && data.success) {
-            window.location.href = data.payment_url; // Redirect to NowPayments
+            window.location.href = data.payment_url; // ✅ Redirect to NowPayments
         } else {
             alert(data.error || "Something went wrong.");
         }
     } catch (error) {
         console.error("Deposit error:", error);
+        alert("An error occurred while processing your deposit.");
     }
 }
+
 document.addEventListener("DOMContentLoaded", function () {
     const notificationIcon = document.getElementById("notificationIcon");
     const announcementPopup = document.getElementById("announcementPopup");

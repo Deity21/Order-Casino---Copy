@@ -106,29 +106,49 @@ header{
     text-align: center;
     gap: 27px;
 }
-.hero-btns{
-    display: flex;
-    gap: 1em;
-    justify-content: center;
-}
+
 aside svg{
   color: #33803B;
 }
-.hero-btns button{
-    width: 120px;
-    height: 2.6rem;
-    color: #fff;
-    background-color: #070808;
-    border: none;
-    border-radius: 8px;
-    border: 1px solid #fff;
+.hero-btns {
+  display: flex;          /* Keeps buttons in a row */
+  flex-wrap: nowrap;      /* Prevents wrapping */
+  justify-content: center; /* Centers buttons */
+  align-items: center;    /* Aligns buttons vertically */
+  gap: 20px;             /* Adds spacing between buttons */
+  max-width: 100%;
 }
-#start{
-    background-color: #33803B;
-    width: 110px;
-    border: 5px solid #33803b9c;
-    align-content: center;
+
+/* ✅ Ensure all buttons follow the same styling */
+.hero-btns button, #start {
+  width: 120px;
+  height: 2.6rem;
+  color: #fff;
+  background-color: #070808;
+  border: none;
+  border-radius: 8px;
+  border: 1px solid #fff;
+  text-align: center;
+  padding: 10px 0;
+  cursor: pointer;
 }
+
+/* ✅ Corrects the "Start Playing" button style */
+#start {
+  background-color: #33803B;
+  border: 5px solid #33803b9c;
+  font-size: 14px;
+  display: inline-block;  /* Makes it align properly with the other button */
+  margin: 0;              /* Removes auto centering */
+}
+
+/* ✅ Ensure buttons stack only on very small screens */
+@media (max-width: 600px) {
+  .hero-btns {
+      flex-direction: column;
+  }
+}
+
 .search{
     width: 100%;
     display: flex;
