@@ -904,9 +904,30 @@ def get_transactions():
 
     return jsonify({'transactions': transactions})
 
+@app.route('/admin/set-balance/<int:user_id>', methods=['POST'])
+def set_user_balance(user_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    data = request.get_json()
+    new_balance = data.get('balance')
+
+    if new_balance is None or not isinstance(new_balance, (int, float)) or new_balance < 0:
+        return jsonify({'error': 'Invalid balance amount'}), 400
+
+    user.balance = new_balance  # Admin sets new balance directly
+    db.session.commit()
+
+    return jsonify({'message': 'User balance updated successfully!', 'new_balance': user.balance})
+
 with app.app_context():
     db.create_all()  # ✅ Ensure tables are created before running the app
     
 
 if __name__ == '__main__':
     app.run(debug=True)
+

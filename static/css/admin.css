@@ -60,6 +60,7 @@ body {
 }
 
 /* 🎯 Admin Content */
+/* Admin Panel Styling */
 .admin-content {
     margin-left: 280px;
     padding: 30px;
@@ -109,6 +110,49 @@ button {
 button:hover {
     background: #ffcc66;
 }
+
+/* ✅ Input Fields for Balance Update */
+input[type='number'] {
+    width: 100px;
+    padding: 8px;
+    margin: 5px;
+    border: 2px solid #ff9900;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+    background: #222;
+    color: #fff;
+}
+
+/* ✅ Balance Cell Styling */
+.balance-cell {
+    font-weight: bold;
+    color: #00ff7f; /* Green color for balance */
+}
+
+/* ✅ Responsive Adjustments */
+@media (max-width: 768px) {
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px;
+    }
+    
+    table {
+        width: 100%;
+    }
+
+    input[type='number'] {
+        width: 80px;
+        font-size: 12px;
+    }
+    
+    button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
 
 /* ❌ Delete Button */
 .delete-btn {

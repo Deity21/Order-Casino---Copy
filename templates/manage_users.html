@@ -18,15 +18,19 @@
             <td>{{ user.id }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
-            <td>${{ user.balance }}</td>
+            <td id="balance-{{ user.id }}">${{ user.balance }}</td>
             <td>{% if user.is_admin %} ✅ {% else %} ❌ {% endif %}</td>
             <td>
                 <button onclick="banUser({{ user.id }})">Ban/Unban</button>
+                <br>
+                <input type="number" id="amount-{{ user.id }}" placeholder="Amount" min="1">
+                <button onclick="updateBalance({{ user.id }})">Update Balance</button>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
 <script>
 function banUser(userId) {
     fetch(`/admin/ban-user/${userId}`, { method: "POST" })
@@ -34,5 +38,31 @@ function banUser(userId) {
         .then(data => alert(data.message))
         .catch(err => console.error(err));
 }
+
+function updateBalance(userId) {
+    const balance = parseFloat(document.getElementById(`amount-${userId}`).value);
+    
+    if (isNaN(balance) || balance < 0) {
+        alert("Enter a valid balance amount.");
+        return;
+    }
+
+    fetch(`/admin/set-balance/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ balance: balance })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.message) {
+            document.getElementById(`balance-${userId}`).innerText = `$${data.new_balance}`;
+            alert(data.message);
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(err => console.error(err));
+}
+
 </script>
 {% endblock %}
