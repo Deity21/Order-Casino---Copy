@@ -563,7 +563,7 @@ def create_deposit():
         "price_currency": "usd",
         "pay_currency": pay_currency,  # ✅ Correct format for NowPayments
         "order_id": order_id,
-        "ipn_callback_url": "https://yourdomain.com/nowpayments-webhook"
+        "ipn_callback_url": "https://https://glamorillaslots.com/nowpayments-webhook"
     }
 
     response = requests.post("https://api.nowpayments.io/v1/invoice", json=payload, headers=headers)
