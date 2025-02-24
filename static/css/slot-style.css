@@ -188,8 +188,8 @@ body {
         height: 200px;
     }
     .video-container, .bottom-image-container {
-        width: 160px;
-        height: 160px;
+        width: 120px;
+        height: 120px;
     }
 }
 
@@ -205,7 +205,7 @@ body {
         height: 180px;
     }
     .video-container, .bottom-image-container {
-        width: 140px;
-        height: 140px;
+        width: 100px;
+        height: 100px;
     }
 }
