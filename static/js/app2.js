@@ -177,29 +177,57 @@ function changeProfilePic(event) {
 
 // Display User Balance
 document.addEventListener("DOMContentLoaded", () => {
-  fetch('/profile')
-      .then(response => response.json())
-      .then(data => {
-          if (data.error) {
-              console.error(data.error);
-              return;
-          }
+    fetch('/profile')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
 
-          // Update balance or use a fallback
-          document.querySelector('.balance').textContent = `$${data.balance ? data.balance.toFixed(2) : '20.00'}`;
+            // Update balance (fallback to 20.00 if null)
+            document.querySelector('.balance').textContent = `$${data.balance ? data.balance.toFixed(2) : '20.00'}`;
 
-          // Update username
-          document.querySelector('.user-info p').textContent = data.username;
+            // Update username
+            document.querySelector('.user-info p').textContent = data.username;
 
-          // Update profile picture
-          document.querySelector('.avatar').src = data.profile_pic;
+            // Update profile picture
+            document.querySelector('.avatar').src = data.profile_pic;
 
-          // Save to localStorage
-          localStorage.setItem('username', data.username);
-          localStorage.setItem('profile_pic', data.profile_pic);
-      })
-      .catch(error => console.error('Error fetching user data:', error));
+            // Save to localStorage
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('profile_pic', data.profile_pic);
+        })
+        .catch(error => console.error('Error fetching user data:', error));
 });
+
+function changeUsername(event) {
+    event.preventDefault();
+    const newUsername = prompt("Enter your new username:");
+
+    if (!newUsername) {
+        alert("Username cannot be empty.");
+        return;
+    }
+
+    fetch('/update-username', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: newUsername })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            document.querySelector('.user-info p').textContent = newUsername;
+            localStorage.setItem('username', newUsername);
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => console.error('Error updating username:', error));
+}
+
 
 
 // Transaction History Pop-up

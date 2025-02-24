@@ -257,10 +257,10 @@ def update_username():
     
     data = request.json
     new_username = data.get('username')
-    
-    if not new_username:
-        return jsonify({'error': 'New username is required.'}), 400
-    
+
+    if not new_username or len(new_username) < 3:
+        return jsonify({'error': 'Username must be at least 3 characters long.'}), 400
+
     # Check if the username is already taken
     existing_user = User.query.filter_by(username=new_username).first()
     if existing_user:
@@ -270,7 +270,7 @@ def update_username():
     user = User.query.get(session['user_id'])
     user.username = new_username
     db.session.commit()
-    
+
     return jsonify({'message': 'Username updated successfully.', 'username': new_username}), 200
 
 @app.route('/update-profile-pic', methods=['POST'])
