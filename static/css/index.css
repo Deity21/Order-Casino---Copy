@@ -55,26 +55,32 @@ header {
 .nav img{
     width: 130px;
 }
-.header-buttons button{
-    width: 80px;
-    padding: 10px;
-    border-radius: 10px;
-   background-color: #070808;
-   border: 2px solid #070808;
-   color: #fff;
+.header-buttons button {
+  width: 80px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #070808;
+  border: 2px solid #070808;
+  color: #fff;
 }
-.header-buttons button:hover{
-    cursor: pointer;
-    background-color: #33803B;
+
+.header-buttons button:hover {
+  cursor: pointer;
+  background-color: #33803B;
 }
-.header-right, .header-buttons, .header-last-content{
-    display: flex;
-    align-items: center;
-    gap: .7em;
+
+/* ✅ Ensure Header Content Stays Inside Header */
+.header-right, .header-buttons, .header-last-content {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  max-width: 100%;
 }
-.header-last-content{
-    display: none;
+
+.header-last-content {
+  display: none;
 }
+
 #login-btn{
     background-color: #33803B;
     width: 80px;
