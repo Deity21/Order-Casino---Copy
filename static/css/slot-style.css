@@ -12,7 +12,7 @@ body {
 
 /* Slot Machine Container - Responsive for Mobile & iPad */
 .slot-machine-container {
-    width: 85vw;
+    width: 95vw;
     max-width: 500px;
     height: auto;
     background: linear-gradient(180deg, #ffcfcf, #99000f, #120f77);
@@ -58,7 +58,7 @@ body {
 
 /* Reels - Optimized for Mobile */
 .reel {
-    width: 28%;
+    width: 32%;
     height: 220px;
     overflow: hidden;
     background-size: cover;
@@ -112,19 +112,6 @@ body {
 }
 
 /* Log Box */
-.log-container {
-    width: 400px;
-    height: 200px;
-    background: #000000;
-    color: white;
-    overflow-y: auto;
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 10px;
-    border: 2px solid #ffcc00;
-    text-align: left;
-    font-size: 14px;
-}
 
 /* Game Log Entry */
 .log-entry {
@@ -186,6 +173,7 @@ body {
     }
     .reel {
         height: 200px;
+        
     }
     .video-container, .bottom-image-container {
         width: 120px;

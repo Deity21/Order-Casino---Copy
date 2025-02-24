@@ -45,6 +45,7 @@ header {
   z-index: 1000;
   flex-wrap: nowrap;
   overflow: hidden;
+  border-radius: 10px;
 }
 
 .nav{
