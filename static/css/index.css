@@ -43,7 +43,10 @@ header {
   position: sticky;
   top: 0;
   z-index: 1000;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
+
 .nav{
     display: flex;
     gap: .5rem;
@@ -62,6 +65,7 @@ header {
   background-color: #070808;
   border: 2px solid #070808;
   color: #fff;
+  white-space: nowrap;
 }
 
 .header-buttons button:hover {
@@ -75,11 +79,14 @@ header {
   align-items: center;
   gap: 0.7em;
   max-width: 100%;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .header-last-content {
   display: none;
 }
+
 
 #login-btn{
     background-color: #33803B;
@@ -626,6 +633,7 @@ button:hover {
       font-size: 14px;
       padding: 10px;
     }
+    
   }
 
   @media screen and (min-width:992px) {
@@ -702,4 +710,26 @@ button:hover {
   padding: 10px;
   border-radius: 5px;
   margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+  
+
+  /* ✅ Make header responsive without expanding */
+  header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px;
+  }
+
+  .header-buttons {
+      flex-wrap: wrap;
+      justify-content: center;
+  }
+
+  .header-buttons button {
+      width: auto;
+      padding: 8px 12px;
+  }
 }
