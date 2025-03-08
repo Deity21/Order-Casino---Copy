@@ -324,43 +324,94 @@ document.addEventListener("DOMContentLoaded", async function () {
     async function fetchVIPProgress() {
         try {
             const response = await fetch('/get-vip-progress');
-            const data = await response.json();
+            if (!response.ok) throw new Error("❌ Failed to fetch VIP progress");
 
+            const data = await response.json();
             if (data.error) {
-                console.error("Error:", data.error);
+                console.error("❌ Server Error:", data.error);
                 return;
             }
 
-            const depositAmount = data.deposit_amount;
-            const betAmount = data.bet_amount;
+            // ✅ Ensure values are valid numbers
+            const depositAmount = data.deposit_amount ? parseFloat(data.deposit_amount) : 0;
+            const betAmount = data.bet_amount ? parseFloat(data.bet_amount) : 0;
 
-            // VIP level thresholds
+            // 🎖️ VIP level thresholds
             const depositThreshold = 300;
             const betThreshold = 100;
 
-            // Calculate progress percentages
+            // ✅ Calculate progress percentages safely
             const depositProgress = Math.min((depositAmount / depositThreshold) * 100, 100);
             const betProgress = Math.min((betAmount / betThreshold) * 100, 100);
 
-            // Update text display
-            depositText.innerText = `R$${depositAmount} / R$${depositThreshold}`;
-            betText.innerText = `R$${betAmount} / R$${betThreshold}`;
+            // 🎯 Smoothly update text values
+            if (depositText) depositText.innerText = `R$${depositAmount} / R$${depositThreshold}`;
+            if (betText) betText.innerText = `R$${betAmount} / R$${betThreshold}`;
 
-            // Update progress bars
-            depositBar.style.width = `${depositProgress}%`;
-            betBar.style.width = `${betProgress}%`;
+            // 🎯 Smoothly animate progress bars
+            animateProgressBar(depositBar, depositProgress);
+            animateProgressBar(betBar, betProgress);
 
         } catch (error) {
-            console.error("Error fetching VIP progress:", error);
+            console.error("❌ Error fetching VIP progress:", error);
         }
     }
 
-    // Fetch VIP progress on page load
-    fetchVIPProgress();
+    function animateProgressBar(bar, targetWidth) {
+        if (!bar) return; // Prevent errors if element is missing
+        let currentWidth = parseFloat(bar.style.width) || 0;
+        const step = (targetWidth - currentWidth) / 15; // Smooth animation speed
 
-    // Refresh VIP progress every 10 seconds
+        function update() {
+            currentWidth += step;
+            if (Math.abs(targetWidth - currentWidth) < 0.5) {
+                bar.style.width = `${targetWidth}%`;
+                return;
+            }
+            bar.style.width = `${currentWidth}%`;
+            requestAnimationFrame(update);
+        }
+
+        update();
+    }
+
+    // ✅ Fetch VIP progress on page load
+    await fetchVIPProgress();
+
+    // 🔄 Auto-refresh every 10 seconds
     setInterval(fetchVIPProgress, 10000);
+
+    // ✅ Update progress dynamically after each bet
+    document.getElementById("spin-button").addEventListener("click", async function () {
+        let betAmount = parseFloat(document.getElementById("bet-amount").value);
+        if (isNaN(betAmount) || betAmount <= 0) {
+            console.error("❌ Invalid bet amount");
+            return;
+        }
+
+        try {
+            let response = await fetch("/update-balance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: -betAmount })
+            });
+
+            let data = await response.json();
+            if (!response.ok) {
+                console.error("❌ Error updating balance:", data.error);
+                return;
+            }
+
+            // ✅ Fetch updated deposit & bet progress from the server
+            await fetchVIPProgress();
+
+        } catch (error) {
+            console.error("❌ Error placing bet:", error);
+        }
+    });
 });
+
+
 async function updateBalance(amount) {
     try {
         const response = await fetch('/update-balance', {
@@ -499,17 +550,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
     const betAmountDisplay = document.querySelector(".black-box p:nth-child(2)"); // BET Amount Display
-    
+
     function updateBetAmount() {
-        let totalBetAmount = localStorage.getItem("totalBetAmount") || 0;
+        let totalBetAmount = localStorage.getItem("totalBetAmount");
+        if (!totalBetAmount) {
+            totalBetAmount = 0;
+            localStorage.setItem("totalBetAmount", "0"); // Ensure value is stored
+        }
         betAmountDisplay.innerText = `$${parseFloat(totalBetAmount).toFixed(2)}`;
     }
 
-    // Initial load
+    // ✅ Initial load
     updateBetAmount();
 
-    // Listen for storage updates from slot.js
+    // ✅ Listen for storage updates (for real-time updates across tabs/sessions)
     window.addEventListener("storage", updateBetAmount);
+
+    // ✅ Ensure BET amount updates after each spin
+    document.getElementById("spin-button").addEventListener("click", function () {
+        let betAmount = parseFloat(document.getElementById("bet-amount").value);
+        if (isNaN(betAmount) || betAmount <= 0) {
+            console.error("❌ Invalid bet amount entered");
+            return;
+        }
+
+        // ✅ Update local storage value
+        let currentTotal = parseFloat(localStorage.getItem("totalBetAmount") || 0);
+        let newTotal = currentTotal + betAmount;
+        localStorage.setItem("totalBetAmount", newTotal.toString());
+
+        // ✅ Refresh display
+        updateBetAmount();
+    });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -799,3 +871,74 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    const learnMoreBtn = document.getElementById("learn-more-btn");
+    const popup = document.getElementById("game-info-popup");
+    const closeBtn = document.querySelector(".game-popup-close");
+
+    // Show pop-up when button is clicked
+    learnMoreBtn.addEventListener("click", () => {
+        popup.style.display = "block";
+    });
+
+    // Close pop-up when close button is clicked
+    closeBtn.addEventListener("click", () => {
+        popup.style.display = "none";
+    });
+
+    // Close pop-up when clicking outside of it
+    window.addEventListener("click", (event) => {
+        if (event.target === popup) {
+            popup.style.display = "none";
+        }
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const forgotPasswordBtn = document.getElementById("forgot-password-btn");
+    const forgotPopup = document.getElementById("forgot-password-popup");
+    const closePopup = document.querySelector(".popup-close");
+    const recoverPasswordBtn = document.getElementById("recover-password-btn");
+
+    // Show forgot password pop-up
+    forgotPasswordBtn.addEventListener("click", () => {
+        forgotPopup.style.display = "block";
+    });
+
+    // Close the pop-up
+    closePopup.addEventListener("click", () => {
+        forgotPopup.style.display = "none";
+    });
+
+    // Handle password recovery
+    recoverPasswordBtn.addEventListener("click", async () => {
+        const email = document.getElementById("forgot-email").value;
+        const warningText = document.getElementById("forgot-warning");
+
+        if (!email) {
+            warningText.innerText = "⚠ Please enter your email!";
+            return;
+        }
+
+        // Send request to Flask backend
+        try {
+            let response = await fetch("/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+
+            let data = await response.json();
+            if (response.ok) {
+                warningText.innerText = "✅ Password sent to your email!";
+                warningText.style.color = "green";
+            } else {
+                warningText.innerText = `❌ ${data.error}`;
+                warningText.style.color = "red";
+            }
+        } catch (error) {
+            warningText.innerText = "❌ Error sending request!";
+            warningText.style.color = "red";
+        }
+    });
+});

@@ -100,14 +100,30 @@
               <div id="signup-tab" onclick="switchTab('signup')">Sign Up</div>
           </div>
           <div id="login-form" class="form-container active">
-              <h2>Sign In</h2>
-              <form id="loginForm">
-                  <input id="login-email" type="email" placeholder="Email" required><br>
-                  <input id="login-password" type="password" placeholder="Password" required><br>
-                  <div id="login-warning" class="warning-text"></div>
-                  <button type="submit">Login</button>
-              </form>
-          </div>
+            <h2>Sign In</h2>
+            <form id="loginForm">
+                <input id="login-email" type="email" placeholder="Email" required><br>
+                <input id="login-password" type="password" placeholder="Password" required><br>
+                <div id="login-warning" class="warning-text"></div>
+                <button type="submit">Login</button>
+            </form>
+        
+            <!-- Forgot Password Button -->
+            <button id="forgot-password-btn" class="forgot-btn">Forgot Password?</button>
+        </div>
+        
+        <!-- Forgot Password Pop-up -->
+        <div id="forgot-password-popup" class="popup-container">
+            <div class="popup-box">
+                <span class="popup-close">&times;</span>
+                <h3>🔑 Recover Your Password</h3>
+                <p>Enter your registered email to receive your password.</p>
+                <input id="forgot-email" type="email" placeholder="Enter your email" required>
+                <button id="recover-password-btn">Submit</button>
+                <div id="forgot-warning" class="warning-text"></div>
+            </div>
+        </div>
+        
           <div id="signup-form" class="form-container">
               <h2>Sign Up</h2>
               <form id="signUpForm">
@@ -126,7 +142,31 @@
             <p style="font-size: 12px;">Play with Bitcoin, Ethereum, Solana and more!</p>
             <div class="hero-btns">
                 <button id="start">Start Playing</button>
-                <button>Learn More</button>
+                <!-- Learn More Button -->
+                <button id="learn-more-btn">Learn More</button>
+
+                <!-- Custom Pop-up -->
+                <div id="game-info-popup" class="game-popup">
+                    <div class="game-popup-box">
+                        <span class="game-popup-close">&times;</span>
+                        <h2>Welcome to Glamorialla Slot Game!</h2>
+                        <p>🎰 This game is a fun and interactive slot machine where you can spin to win rewards!</p>
+                        <h3>💡 How to Play:</h3>
+                        <ul>
+                            <li>Enter your desired bet amount.</li>
+                            <li>Click the <b>Spin</b> button to start.</li>
+                            <li>Watch the reels spin in real-time.</li>
+                            <li>Match 3 symbols to win big!</li>
+                        </ul>
+                        <h3>🔥 Tips to Win:</h3>
+                        <ul>
+                            <li>Higher bets give bigger rewards.</li>
+                            <li>Look out for special symbols—they offer bonuses!</li>
+                            <li>Keep an eye on your balance and play strategically.</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
             <!-- <div class="hero-icons">
               <img src="/static/images/facebook.png" alt="">

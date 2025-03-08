@@ -6,11 +6,22 @@ from datetime import datetime
 from config import Config
 from sqlalchemy.orm import Session
 import requests
+import logging
+import random
+import string
 
 from flask_mail import Mail, Message
 
 # ✅ Flask-Mail Configuration
 
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+
+card_images = [
+    "static/images/card1.png", "static/images/card2.png", "static/images/card3.png",
+    "static/images/card4.png", "static/images/card5.png", "static/images/card6.png",
+    "static/images/card7.png", "static/images/card8.png", "static/images/card9.png",
+    "static/images/card10.png", "static/images/card11.png", "static/images/card12.png"
+]
 
 
 app = Flask(__name__)
@@ -43,7 +54,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=True)  # ✅ Allow null if not required
     password = db.Column(db.String(200), nullable=False)
     profile_pic = db.Column(db.String(200), default='./static/images/default.png')
-    balance = db.Column(db.Float, default=100.0)
+    balance = db.Column(db.Float, default=10.0)
     deposit_amount = db.Column(db.Float, default=0.0)
     bet_amount = db.Column(db.Float, default=0.0)
     is_banned = db.Column(db.Boolean, default=False)
@@ -331,64 +342,63 @@ def add_transaction():
 @app.route('/get-balance', methods=['GET'])
 def get_balance():
     if 'user_id' not in session:
-        app.logger.warning("Balance check failed: User not logged in")
+        app.logger.warning("❌ Balance check failed: User not logged in")
         return jsonify({'error': 'User not logged in.'}), 401
 
-    user = User.query.get(session['user_id'])
+    user = db.session.get(User, session['user_id'])
     if not user:
-        app.logger.error("Balance check failed: User not found")
+        app.logger.error("❌ Balance check failed: User not found")
         return jsonify({'error': 'User not found.'}), 404
 
-    app.logger.info(f"Balance fetched successfully for user {user.username}: ${user.balance}")
+    app.logger.info(f"✅ Balance fetched successfully for {user.username}: ${user.balance}")
     return jsonify({'balance': user.balance}), 200
 
 @app.route('/update-balance', methods=['POST'])
 def update_balance():
     if 'user_id' not in session:
+        app.logger.error("🚨 Unauthorized access attempt to /update-balance")
         return jsonify({'error': 'User not logged in'}), 401
 
-    user = User.query.get(session['user_id'])
+    user = db.session.get(User, session['user_id'])  # ✅ SQLAlchemy 2.0 syntax
     if not user:
+        app.logger.error("🚨 User not found while updating balance")
         return jsonify({'error': 'User not found'}), 404
 
-    data = request.get_json()
-    amount = data.get('amount')
+    try:
+        data = request.get_json()
+        amount = data.get('amount')
 
-    if amount is None or not isinstance(amount, (int, float)):
-        return jsonify({'error': 'Invalid amount'}), 400
+        app.logger.info(f"📩 Incoming request to update balance: {data}")
 
-    if user.balance + amount < 0:
-        return jsonify({'error': 'Insufficient balance'}), 400
+        if amount is None or not isinstance(amount, (int, float)):
+            app.logger.warning(f"⚠️ Invalid amount received: {amount}")
+            return jsonify({'error': 'Invalid amount'}), 400
 
-    # If the amount is negative, it's a bet -> Track bet amount
-    if amount < 0:
-        user.bet_amount += abs(amount)  # Track total bet amount
+        if user.balance + amount < 0:
+            app.logger.warning(f"⚠️ Insufficient balance: {user.balance}, Requested Deduction: {amount}")
+            return jsonify({'error': 'Insufficient balance'}), 400
 
-    user.balance += amount  # Deduct or add based on the amount
-    db.session.commit()
+        # Track bet amount if it's negative
+        if amount < 0:
+            user.bet_amount += abs(amount)
 
-    return jsonify({
-        'balance': user.balance,
-        'bet_amount': user.bet_amount,  # Send updated bet amount
-        'message': 'Balance updated successfully'
-    }), 200
+        old_balance = user.balance
+        user.balance += amount
 
+        db.session.commit()
 
+        app.logger.info(f"✅ Balance updated: {old_balance} → {user.balance} (Bet: {user.bet_amount})")
 
-@app.route('/user-info', methods=['GET'])
-def user_info():
-    if 'user_id' not in session:
-        app.logger.error("User not logged in.")
-        return jsonify({'error': 'User not logged in.'}), 401
+        return jsonify({
+            'balance': user.balance,
+            'bet_amount': user.bet_amount,
+            'message': 'Balance updated successfully'
+        }), 200
 
-    user = User.query.get(session['user_id'])
-    if not user:
-        app.logger.error("User not found in database.")
-        return jsonify({'error': 'User not found.'}), 404
-
-    app.logger.info(f"Fetched user info for {user.username}")
-    return jsonify({'username': user.username, 'balance': user.balance}), 200
-
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"❌ Error updating balance: {str(e)}")
+        return jsonify({'error': 'Database update failed', 'details': str(e)}), 500
 
 @app.route('/log-game', methods=['POST'])
 def log_game():
@@ -438,9 +448,13 @@ def get_vip_progress():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
+    # Ensure numbers are always valid
+    deposit_amount = float(user.deposit_amount) if user.deposit_amount else 0
+    bet_amount = float(user.bet_amount) if user.bet_amount else 0
+
     return jsonify({
-        "deposit_amount": user.deposit_amount,
-        "bet_amount": user.bet_amount
+        "deposit_amount": deposit_amount,
+        "bet_amount": bet_amount
     })
 
 @app.route('/submit-withdrawal', methods=['POST'])
@@ -924,6 +938,105 @@ def set_user_balance(user_id):
 
     return jsonify({'message': 'User balance updated successfully!', 'new_balance': user.balance})
 
+import traceback
+
+import traceback
+
+@app.route('/spin', methods=['POST'])
+def spin():
+    try:
+        if 'user_id' not in session:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        data = request.json
+        bet_amount = float(data.get("bet_amount", 0))
+
+        if bet_amount <= 0:
+            return jsonify({"error": "Invalid bet amount!"}), 400
+
+        if user.balance < bet_amount:
+            return jsonify({"error": "Not enough balance!"}), 400
+
+        # 🎰 Deduct bet first
+        user.balance -= bet_amount
+        db.session.commit()
+
+        # 🎰 Simulate spinning reels
+        card_images = [
+            "static/images/card1.png", "static/images/card2.png", "static/images/card3.png",
+            "static/images/card4.png", "static/images/card5.png", "static/images/card6.png",
+            "static/images/card7.png", "static/images/card8.png", "static/images/card9.png",
+            "static/images/card10.png", "static/images/card11.png", "static/images/card12.png"
+        ]
+
+        reel1, reel2, reel3 = random.choices(card_images, k=3)
+
+        # 🎯 40% Win Probability
+        win_chance = random.random()
+        winnings = 0
+
+        if win_chance <= 0.4:  # 40% chance to win
+            unique_symbols = len(set([reel1, reel2, reel3]))
+            if unique_symbols == 1:
+                winnings = bet_amount * 10  # Jackpot
+            elif unique_symbols == 2:
+                winnings = bet_amount / 3  # Small win
+
+            if winnings > 0:
+                user.balance += winnings + bet_amount  # ✅ Refund bet + winnings
+
+        db.session.commit()
+
+        return jsonify({
+            "reel1": reel1,
+            "reel2": reel2,
+            "reel3": reel3,
+            "balance": user.balance,
+            "winnings": winnings
+        })
+
+    except Exception as e:
+        print("❌ Unexpected error:", e)
+        traceback.print_exc()  # Logs full error details
+        return jsonify({"error": "Unexpected server error"}), 500
+
+    
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.json
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({'error': 'No account found with this email'}), 404
+
+    temporary_password = "sCNgnOVxxY"  # Replace with generated password logic
+
+    # Render the email template
+    email_html = render_template('forgot_password_email.html', 
+                                 username=user.username, 
+                                 temporary_password=temporary_password,
+                                 login_url=url_for('login', _external=True))
+
+    # Send the email
+    try:
+        msg = Message("🔑 Password Recovery - Slot Game", recipients=[email])
+        msg.html = email_html
+        mail.send(msg)
+        app.logger.info(f"✅ Password recovery email sent to {email}")
+        return jsonify({'message': 'Password reset email sent successfully'}), 200
+    except Exception as e:
+        app.logger.error(f"❌ Email error: {e}")
+        return jsonify({'error': 'Failed to send email'}), 500
+    
 with app.app_context():
     db.create_all()  # ✅ Ensure tables are created before running the app
     

@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const reel3 = document.getElementById("reel3");
     const spinButton = document.getElementById("spin-button");
     const balanceDisplay = document.getElementById("balance");
+
     const messageDisplay = document.getElementById("message");
     const betAmountInput = document.getElementById("bet-amount");
     const logContainer = document.getElementById("game-log");
@@ -58,19 +59,43 @@ document.addEventListener("DOMContentLoaded", () => {
         logContainer.scrollTop = logContainer.scrollHeight;
     }
 
+    if (!balanceDisplay) {
+        console.error("🚨 balanceDisplay is NULL! Check if <p id='balance'> exists in slot.html");
+        return;
+    }
+
+    // ✅ Fetch Balance Function
     function fetchBalance() {
+        console.log("📡 Fetching balance...");
+        
         fetch('/get-balance')
-            .then(response => response.json())
+            .then(response => {
+                console.log(`📩 Received Response: HTTP ${response.status}`);
+                return response.json();
+            })
             .then(data => {
+                console.log("📩 Response Data:", data);
                 if (data.error) {
-                    console.error(data.error);
+                    console.error("❌ Error fetching balance:", data.error);
                     return;
                 }
-                balance = data.balance;
-                balanceDisplay.innerText = `Balance: $${balance.toFixed(2)}`;
+
+                balanceDisplay.innerText = `Balance: $${parseFloat(data.balance).toFixed(2)}`;
+                console.log(`✅ Updated balance: $${parseFloat(data.balance).toFixed(2)}`);
             })
-            .catch(error => console.error('Error fetching balance:', error));
+            .catch(error => console.error('❌ Fetch error:', error));
     }
+
+    // ✅ Ensure Fetch Balance Runs Properly
+    fetchBalance();  // Fetch balance immediately when page loads
+
+    // ✅ Check if Network Request Appears
+    setTimeout(() => {
+        console.log("📡 Checking if /get-balance request appeared in Network Tab");
+    }, 2000);
+
+    
+    
 
     function fetchLogs() {
         fetch('/get-logs')
@@ -86,138 +111,119 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function updateBalance(amount) {
+        console.log(`📤 Attempting to update balance with amount: ${amount}`);
+    
         try {
             let response = await fetch('/update-balance', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ amount })
             });
-
+    
+            console.log(`📩 Server Response: HTTP ${response.status}`);
             let data = await response.json();
-            if (response.ok) {
-                balance = data.balance;
-                balanceDisplay.innerText = `$${balance.toFixed(2)}`;
-                
-                // Send total bet amount to profile.js via localStorage
-                localStorage.setItem("totalBetAmount", totalBetAmount);
-                window.dispatchEvent(new Event("storage")); // Trigger update in profile.js
-            } else {
-                console.error(data.error);
+    
+            if (!response.ok) {
+                console.error("❌ Balance update error:", data);
+                messageDisplay.innerText = `Balance update failed: ${data.error}`;
+                return;
             }
+    
+            console.log(`✅ Balance Updated: Old ${balance} → New ${data.balance}`);
+            balance = data.balance;  
+            balanceDisplay.innerText = `Balance: $${balance.toFixed(2)}`;
         } catch (error) {
-            console.error('Error updating balance:', error);
+            console.error('❌ Error updating balance:', error);
         }
     }
     
-    function spinReel(reel, delay) {
-        return new Promise((resolve) => {
-            let spinTime = 2500; 
-            let interval = 100;
-            let elapsed = 0;
-            
-            setTimeout(() => {
-                let spinInterval = setInterval(() => {
-                    let randomIndex = Math.floor(Math.random() * cardImages.length);
-                    reel.style.backgroundImage = `url(${cardImages[randomIndex]})`;
-                    reel.style.transition = "transform 0.2s ease-in-out";
-                    reel.style.transform = "translateY(10px)";
-                    setTimeout(() => reel.style.transform = "translateY(0)", 100);
-                    elapsed += interval;
+    
+    function startReelSpin(reel) {
+        let interval = setInterval(() => {
+            let randomIndex = Math.floor(Math.random() * cardImages.length);
+            reel.style.backgroundImage = `url(${cardImages[randomIndex]})`;
+        }, 80); // Fast spinning
+        return interval;
+    }
 
-                    if (elapsed >= spinTime) {
-                        clearInterval(spinInterval);
-                        resolve(cardImages[randomIndex]);
-                    }
-                }, interval);
-            }, delay);
+    function spinReels(finalReel1, finalReel2, finalReel3) {
+        const reels = [reel1, reel2, reel3];
+        const finalResults = [finalReel1, finalReel2, finalReel3];
+    
+        reels.forEach((reel, index) => {
+            let elapsed = 0;
+            let spinTime = 10000; // 4 seconds of spinning
+            let interval = setInterval(() => {
+                let randomIndex = Math.floor(Math.random() * cardImages.length);
+                reel.style.backgroundImage = `url(${cardImages[randomIndex]})`;
+            }, 100); // Fast spinning effect
+    
+            setTimeout(() => {
+                clearInterval(interval);
+                reel.style.backgroundImage = `url(${finalResults[index]})`; // ✅ Show final image and KEEP IT
+            }, spinTime);
         });
     }
+    
+    
 
     async function spinSlot() {
-        buttonClickSound.play(); // 🎵 Button Click Sound
-    
-        let betAmount = parseFloat(betAmountInput.value);
-        if (isNaN(betAmount) || betAmount <= 0) {
-            messageDisplay.innerText = "Enter a valid bet amount!";
-            return;
-        }
-        if (balance < betAmount) {
-            messageDisplay.innerText = "Not enough balance!";
-            return;
-        }
-    
-        spinButton.disabled = true;
-        messageDisplay.innerText = "Spinning... 🎰";
-    
         try {
-            // Deduct bet amount from balance
-            await fetch('/update-balance', {
+            buttonClickSound.play();
+    
+            let betAmount = parseFloat(betAmountInput.value);
+            if (isNaN(betAmount) || betAmount <= 0) {
+                messageDisplay.innerText = "Enter a valid bet amount!";
+                return;
+            }
+    
+            console.log("📤 Sending spin request...");
+    
+            let response = await fetch('/spin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: -betAmount })
+                body: JSON.stringify({ bet_amount: betAmount })
             });
     
-            balance -= betAmount;
-            balanceDisplay.innerText = `Balance: $${balance.toFixed(2)}`;
+            let data = await response.json();
     
-            // 🎵 Start spinning sound
-            spinSound.loop = true;
-            spinSound.play();
-    
-            let results = await Promise.all([
-                spinReel(reel1, 300),
-                spinReel(reel2, 800),
-                spinReel(reel3, 1400)
-            ]);
-    
-            // 🎵 Stop spinning sound
-            spinSound.pause();
-            spinSound.currentTime = 0;
-    
-            let uniqueSymbols = new Set(results);
-            let winnings = 0;
-    
-            if (uniqueSymbols.size === 1) {
-                // 🎉 Jackpot - All 3 match (10x winnings)
-                winnings = betAmount * 10;
-                messageDisplay.innerText = `🎉 JACKPOT! +$${winnings} 🎉`;
-                winSound.play();
-            } else if (uniqueSymbols.size === 2) {
-                // ✅ Fix: If 2 symbols match, give back 1/3 of the bet amount
-                winnings = betAmount / 3;
-                messageDisplay.innerText = `🎊 Small Win! +$${winnings.toFixed(2)} 🎊`;
-                winSound.play();
-            } else {
-                // ❌ No Win
-                messageDisplay.innerText = "Try Again! ❌";
-                loseSound.play();
+            if (response.status === 401) {
+                console.error("❌ User not authenticated.");
+                messageDisplay.innerText = "You must log in to play!";
+                return;
             }
     
-            if (winnings > 0) {
-                // ✅ Ensure winnings are added back
-                await fetch('/update-balance', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: winnings })
-                });
-    
-                balance += winnings;  // ✅ Add winnings back
-                balanceDisplay.innerText = `Balance: $${balance.toFixed(2)}`;
+            if (!response.ok) {
+                console.error("❌ Spin failed:", data.error);
+                messageDisplay.innerText = `Error: ${data.error}`;
+                return;
             }
     
-            logGameResult(betAmount, winnings, balance); // ✅ Log game to backend
+            console.log("✅ Spin successful:", data);
     
+            // ✅ Start spinning animation while waiting for results
+            spinReels(data.reel1, data.reel2, data.reel3);
+    
+            // ✅ Display Result after spinning stops
+            setTimeout(() => {
+                if (data.winnings > 0) {
+                    messageDisplay.innerHTML = `🎉 You won $${data.winnings}! 🎉`;
+                    winSound.play();
+                } else {
+                    messageDisplay.innerHTML = "❌ Try Again!";
+                    loseSound.play();
+                }
+            }, 4000); // Wait until spinning finishes
         } catch (error) {
-            console.error('Spin error:', error);
+            console.error("❌ Error during spin:", error);
+            messageDisplay.innerText = "Unexpected error!";
         }
-    
-        spinButton.disabled = false;
     }
     
     
-    
-    
-    
+    spinButton.addEventListener("click", spinSlot);
+
+
 
     async function logGameResult(bet, winnings, balance) {
         try {
@@ -228,13 +234,18 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     
             let result = await response.json();
+    
+            if (!response.ok) {
+                console.error("❌ Game log failed:", result);
+                return;
+            }
+    
             console.log("✅ Game log stored:", result.message);
         } catch (error) {
             console.error("❌ Error logging game result:", error);
         }
     }
     
-
     spinButton.addEventListener("click", spinSlot);
     loadLogsFromLocalStorage();
     fetchBalance();
