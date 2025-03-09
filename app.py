@@ -940,7 +940,7 @@ def set_user_balance(user_id):
 
 import traceback
 
-import traceback
+
 
 @app.route('/spin', methods=['POST'])
 def spin():
@@ -982,20 +982,20 @@ def spin():
         if win_chance <= 0.4:  # 40% chance to win
             unique_symbols = len(set([reel1, reel2, reel3]))
             if unique_symbols == 1:
-                winnings = bet_amount * 10  # Jackpot
+                winnings = bet_amount * 10  # 🎰 Jackpot Win
             elif unique_symbols == 2:
-                winnings = bet_amount / 3  # Small win
+                winnings = bet_amount / 3  # 🎉 Small Win
 
             if winnings > 0:
                 user.balance += winnings + bet_amount  # ✅ Refund bet + winnings
 
-        db.session.commit()
+        db.session.commit()  # ✅ Ensure all updates are saved
 
         return jsonify({
             "reel1": reel1,
             "reel2": reel2,
             "reel3": reel3,
-            "balance": user.balance,
+            "balance": round(user.balance, 2),  # 🔹 Ensure balance is rounded for UI
             "winnings": winnings
         })
 

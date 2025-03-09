@@ -204,6 +204,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // ✅ Start spinning animation while waiting for results
             spinReels(data.reel1, data.reel2, data.reel3);
     
+            // ✅ Update Balance Immediately
+            balance = data.balance;
+            balanceDisplay.innerText = `Balance: $${balance.toFixed(2)}`;
+    
             // ✅ Display Result after spinning stops
             setTimeout(() => {
                 if (data.winnings > 0) {
