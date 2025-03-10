@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function spinSlot() {
         try {
-            buttonClickSound.play();
+            buttonClickSound.play();  // 🎵 Button click sound when spin is pressed
     
             let betAmount = parseFloat(betAmountInput.value);
             if (isNaN(betAmount) || betAmount <= 0) {
@@ -201,28 +201,30 @@ document.addEventListener("DOMContentLoaded", () => {
     
             console.log("✅ Spin successful:", data);
     
-            // ✅ Start spinning animation while waiting for results
-            spinReels(data.reel1, data.reel2, data.reel3);
-    
             // ✅ Update Balance Immediately
             balance = data.balance;
             balanceDisplay.innerText = `Balance: $${balance.toFixed(2)}`;
     
-            // ✅ Display Result after spinning stops
+            // ✅ Start spinning animation
+            spinReels(data.reel1, data.reel2, data.reel3);
+    
+            // ✅ Play the correct sound & display result after animation
             setTimeout(() => {
                 if (data.winnings > 0) {
-                    messageDisplay.innerHTML = `🎉 You won $${data.winnings}! 🎉`;
-                    winSound.play();
+                    messageDisplay.innerHTML = `🎉 You won $${data.winnings.toFixed(2)}! 🎉`;
+                    winSound.play(); // 🎵 Play WIN sound
                 } else {
                     messageDisplay.innerHTML = "❌ Try Again!";
-                    loseSound.play();
+                    loseSound.play(); // 🎵 Play LOSE sound
                 }
-            }, 4000); // Wait until spinning finishes
+            }, 3000); // 3 seconds delay to match animation
+    
         } catch (error) {
             console.error("❌ Error during spin:", error);
             messageDisplay.innerText = "Unexpected error!";
         }
     }
+    
     
     
     spinButton.addEventListener("click", spinSlot);
